@@ -1,0 +1,8 @@
+target/
+.idea/
+*.iml
+src/main/resources/db.properties
+src/main/resources/common/db.properties
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/apache-maven-*/
+.mvn/wrapper/*-bin.zip
