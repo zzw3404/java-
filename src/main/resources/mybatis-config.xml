@@ -25,5 +25,6 @@
     <mappers>
         <mapper resource="chapter01/mapper/UserMapper.xml"/>
         <mapper class="com.example.mapper.UserMapperAnnotation"/>
+        <mapper class="com.example.mapper.UserMapperMixed"/>
     </mappers>
 </configuration>
