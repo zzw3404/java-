@@ -17,4 +17,25 @@
         FROM `user`
         WHERE id = #{id}
     </select>
+
+    <insert id="addUser"
+            parameterType="com.example.entity.User"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO `user` (username, password, email)
+        VALUES (#{username}, #{password}, #{email})
+    </insert>
+
+    <update id="updateUser" parameterType="com.example.entity.User">
+        UPDATE `user`
+        SET username = #{username},
+            password = #{password},
+            email = #{email}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteUser" parameterType="java.lang.Integer">
+        DELETE FROM `user`
+        WHERE id = #{id}
+    </delete>
 </mapper>
