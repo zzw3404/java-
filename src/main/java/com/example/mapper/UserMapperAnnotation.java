@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户 Mapper 注解版 CRUD 示例。
@@ -36,4 +37,35 @@ public interface UserMapperAnnotation {
 
     @Delete("DELETE FROM `user` WHERE id = #{id}")
     int deleteUser(@Param("id") Integer id);
+
+    /** 使用 @Param 明确指定多个参数的名字。 */
+    @Select("SELECT id, username, password, email, created_at, updated_at "
+            + "FROM `user` WHERE username = #{username} AND email = #{email}")
+    List<User> findByNameAndEmail(@Param("username") String username,
+                                  @Param("email") String email);
+
+    /** Map 中的 key 会对应 SQL 中的参数名。 */
+    @Select("SELECT id, username, password, email, created_at, updated_at "
+            + "FROM `user` WHERE username = #{username} AND email = #{email}")
+    List<User> findByMap(Map<String, Object> params);
+
+    @Select("SELECT id, username, password, email, created_at, updated_at "
+            + "FROM `user` WHERE username LIKE CONCAT('%', #{username}, '%') "
+            + "ORDER BY id")
+    List<User> findByUsernameLike(@Param("username") String username);
+
+    /** #{username} 使用预编译参数，是正常业务中的安全写法。 */
+    @Select("SELECT id, username, password, email, created_at, updated_at "
+            + "FROM `user` WHERE username = #{username} AND password = #{password}")
+    User loginSafe(@Param("username") String username,
+                   @Param("password") String password);
+
+    /**
+     * 仅用于课堂演示 ${} 的 SQL 注入风险，禁止在真实业务中使用。
+     */
+    @Deprecated
+    @Select("SELECT id, username, password, email, created_at, updated_at "
+            + "FROM `user` WHERE username = '${username}' AND password = '${password}'")
+    User loginUnsafe(@Param("username") String username,
+                     @Param("password") String password);
 }

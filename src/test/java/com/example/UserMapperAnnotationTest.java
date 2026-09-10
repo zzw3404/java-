@@ -10,11 +10,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /** 注解版 UserMapper 集成测试。 */
@@ -97,6 +100,42 @@ public class UserMapperAnnotationTest {
             assertTrue("删除后不应该再查到该用户", mapper.findById(user.getId()) == null);
         } finally {
             deleteIfCreated(user.getId());
+        }
+    }
+
+    @Test
+    public void testParamAndMapArguments() {
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            UserMapperAnnotation mapper = sqlSession.getMapper(UserMapperAnnotation.class);
+
+            List<User> byParam = mapper.findByNameAndEmail(
+                    "testuser1", "testuser1@example.com");
+            assertEquals(1, byParam.size());
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("username", "testuser1");
+            params.put("email", "testuser1@example.com");
+            List<User> byMap = mapper.findByMap(params);
+            assertEquals(1, byMap.size());
+
+            assertTrue(mapper.findByUsernameLike("testuser").size() >= 10);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void testHashPlaceholderAndDollarPlaceholder() {
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            UserMapperAnnotation mapper = sqlSession.getMapper(UserMapperAnnotation.class);
+
+            User safeLogin = mapper.loginSafe("testuser1", "password123");
+            assertNotNull("正确账号密码应该能够登录", safeLogin);
+
+            User injectionAgainstSafeSql = mapper.loginSafe("testuser1' -- ", "wrong");
+            assertNull("#{ } 预编译参数应该阻止注入", injectionAgainstSafeSql);
+
+            User injectionAgainstUnsafeSql = mapper.loginUnsafe("testuser1' -- ", "wrong");
+            assertNotNull("${ } 仅用于演示：该输入会暴露 SQL 注入风险", injectionAgainstUnsafeSql);
         }
     }
 
