@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.chapter02.mapper.EmpDeptMapper">
+
+    <resultMap id="empWithDeptMap" type="com.example.chapter02.entity.Emp">
+        <id property="empno" column="empno"/>
+        <result property="ename" column="ename"/>
+        <result property="job" column="job"/>
+        <result property="mgr" column="mgr"/>
+        <result property="hiredate" column="hiredate"/>
+        <result property="sal" column="sal"/>
+        <result property="comm" column="comm"/>
+        <result property="deptno" column="emp_deptno"/>
+        <result property="deleted" column="emp_deleted"/>
+        <association property="dept" javaType="com.example.chapter02.entity.Dept">
+            <id property="deptno" column="deptno"/>
+            <result property="dname" column="dname"/>
+            <result property="loc" column="loc"/>
+            <result property="deleted" column="dept_deleted"/>
+        </association>
+    </resultMap>
+
+    <select id="findAllEmpWithDept" resultMap="empWithDeptMap">
+        SELECT e.empno,
+               e.ename,
+               e.job,
+               e.mgr,
+               e.hiredate,
+               e.sal,
+               e.comm,
+               e.deptno AS emp_deptno,
+               e.deleted AS emp_deleted,
+               d.deptno,
+               d.dname,
+               d.loc,
+               d.deleted AS dept_deleted
+        FROM emp e
+        LEFT JOIN dept d ON e.deptno = d.deptno
+        WHERE e.deleted = 0
+          AND (d.deleted = 0 OR d.deptno IS NULL)
+        ORDER BY e.empno
+    </select>
+
+    <select id="findEmpWithDeptById"
+            parameterType="java.lang.Integer"
+            resultMap="empWithDeptMap">
+        SELECT e.empno,
+               e.ename,
+               e.job,
+               e.mgr,
+               e.hiredate,
+               e.sal,
+               e.comm,
+               e.deptno AS emp_deptno,
+               e.deleted AS emp_deleted,
+               d.deptno,
+               d.dname,
+               d.loc,
+               d.deleted AS dept_deleted
+        FROM emp e
+        LEFT JOIN dept d ON e.deptno = d.deptno
+        WHERE e.empno = #{empno}
+          AND e.deleted = 0
+          AND (d.deleted = 0 OR d.deptno IS NULL)
+    </select>
+
+    <resultMap id="deptWithEmpsMap" type="com.example.chapter02.entity.Dept">
+        <id property="deptno" column="deptno"/>
+        <result property="dname" column="dname"/>
+        <result property="loc" column="loc"/>
+        <result property="deleted" column="dept_deleted"/>
+        <collection property="emps"
+                    ofType="com.example.chapter02.entity.Emp">
+            <id property="empno" column="empno"/>
+            <result property="ename" column="ename"/>
+            <result property="job" column="job"/>
+            <result property="mgr" column="mgr"/>
+            <result property="hiredate" column="hiredate"/>
+            <result property="sal" column="sal"/>
+            <result property="comm" column="comm"/>
+            <result property="deptno" column="emp_deptno"/>
+            <result property="deleted" column="emp_deleted"/>
+        </collection>
+    </resultMap>
+
+    <select id="findAllDeptWithEmps" resultMap="deptWithEmpsMap">
+        SELECT d.deptno,
+               d.dname,
+               d.loc,
+               d.deleted AS dept_deleted,
+               e.empno,
+               e.ename,
+               e.job,
+               e.mgr,
+               e.hiredate,
+               e.sal,
+               e.comm,
+               e.deptno AS emp_deptno,
+               e.deleted AS emp_deleted
+        FROM dept d
+        LEFT JOIN emp e ON d.deptno = e.deptno AND e.deleted = 0
+        WHERE d.deleted = 0
+        ORDER BY d.deptno, e.empno
+    </select>
+
+    <select id="findDeptWithEmpsById"
+            parameterType="java.lang.Integer"
+            resultMap="deptWithEmpsMap">
+        SELECT d.deptno,
+               d.dname,
+               d.loc,
+               d.deleted AS dept_deleted,
+               e.empno,
+               e.ename,
+               e.job,
+               e.mgr,
+               e.hiredate,
+               e.sal,
+               e.comm,
+               e.deptno AS emp_deptno,
+               e.deleted AS emp_deleted
+        FROM dept d
+        LEFT JOIN emp e ON d.deptno = e.deptno AND e.deleted = 0
+        WHERE d.deptno = #{deptno}
+          AND d.deleted = 0
+        ORDER BY e.empno
+    </select>
+</mapper>

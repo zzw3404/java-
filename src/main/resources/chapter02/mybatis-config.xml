@@ -25,6 +25,7 @@
     <mappers>
         <mapper resource="chapter02/mapper/LegacyUserMapper.xml"/>
         <mapper resource="chapter02/mapper/UserMapper.xml"/>
+        <mapper resource="chapter02/mapper/EmpDeptMapper.xml"/>
         <mapper class="com.example.chapter02.mapper.UserMapperAnnotation"/>
     </mappers>
 </configuration>
